@@ -25,9 +25,9 @@ public class ModConfig {
     public static final ModConfigSpec.EnumValue<Orientation> orientation = BUILDER.defineEnum("orientation", Orientation.DOWN);
     public static final ModConfigSpec.ConfigValue<Integer> cycleSeconds = BUILDER.define("cycleSeconds", 20);
     public static final ModConfigSpec.BooleanValue earlyWindowOverlay = BUILDER.comment("Show LoadingScreen Over NeoForge LoadingScreen")
-            .define("earlyWindowOverlay", false);
-    public static final ModConfigSpec.ConfigValue<Integer> earlyOverlayOpacity = BUILDER.comment("Set Early LoadingScreen Overlay Alpha")
-            .defineInRange("earlyOverlayOpacity", 45, 0, 100);
+            .define("earlyWindowOverlay", true);
+    public static final ModConfigSpec.ConfigValue<Integer> iconOpacity = BUILDER.comment("Set Icon Alpha")
+            .defineInRange("iconOpacity", 75, 0, 100);
     private static final ModConfigSpec.Builder pop = BUILDER.pop();
     public static final ModConfigSpec SPEC = BUILDER.build();
 

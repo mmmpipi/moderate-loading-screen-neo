@@ -27,7 +27,7 @@ public class ModMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.equals("dev.enjarai.mls.mixin.ForgeLoadingOverlayMixin")){
-            boolean enable = false;
+            boolean enable = true;
             var config = FileConfig.of(FMLPaths.CONFIGDIR.get().resolve("mls-client.toml"));
             try (config){
                 config.load();

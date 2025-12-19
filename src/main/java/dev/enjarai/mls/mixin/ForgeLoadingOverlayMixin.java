@@ -39,7 +39,7 @@ public abstract class ForgeLoadingOverlayMixin extends Overlay {
     @Unique
     private LoadingScreen moderateLoadingScreen$loadingScreen;
     @Unique
-    private final float moderateLoadingScreen$loadingScreenAlpha = ModConfig.earlyOverlayOpacity.get()/100F;
+    private final float moderateLoadingScreen$loadingScreenAlpha = ModConfig.iconOpacity.get()/100F;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void moderateLoadingScreen$constructor(Minecraft mc, ReloadInstance reloader, Consumer errorConsumer, DisplayWindow displayWindow, CallbackInfo ci) {
@@ -51,7 +51,7 @@ public abstract class ForgeLoadingOverlayMixin extends Overlay {
 //        moderateLoadingScreen$loadingScreen.setHeightSupplier(()->this.minecraft.getWindow().getHeight());
         moderateLoadingScreen$loadingScreen.setWidthSupplier(()->this.displayWindow.context().width());
         moderateLoadingScreen$loadingScreen.setHeightSupplier(()->this.displayWindow.context().height());
-        moderateLoadingScreen$loadingScreen.scaleFix=Optional.of(()-> (float) this.minecraft.getWindow().getHeight()/(float) this.displayWindow.context().height());
+        moderateLoadingScreen$loadingScreen.setScaleFix(()-> (float) this.minecraft.getWindow().getHeight()/(float) this.displayWindow.context().height());
     }
 
 //    @ModifyVariable(method = "render", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/neoforged/fml/earlydisplay/ColourScheme;background()Lnet/neoforged/fml/earlydisplay/ColourScheme$Colour;"))

@@ -30,7 +30,7 @@ public abstract class LoadingScreen {
     protected Supplier<Integer> heightSupplier;
     //protected boolean tater = ModerateLoadingScreen.CONFIG.showTater;
     protected boolean modsOnlyOnce = ModConfig.modsOnlyOnce.get();
-    public Optional<Supplier<Float>> scaleFix = Optional.empty();
+    protected Optional<Supplier<Float>> scaleFix = Optional.empty();
     protected int offsetX = 0;
     protected int offsetY = 0;
 
@@ -58,6 +58,11 @@ public abstract class LoadingScreen {
         this.offsetX = x;
         this.offsetY = y;
     }
+
+    public void setScaleFix(Supplier<Float> supplier){
+        this.scaleFix = Optional.of(supplier);
+    }
+
     public void setWidthSupplier(Supplier<Integer> supplier){
         this.widthSupplier = supplier;
     }

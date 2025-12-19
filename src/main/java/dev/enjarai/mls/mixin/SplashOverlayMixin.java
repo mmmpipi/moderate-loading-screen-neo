@@ -65,8 +65,9 @@ public abstract class SplashOverlayMixin extends Overlay {
     // logo前注入图标
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;guiHeight()I", ordinal = 2), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void moderateLoadingScreen$renderPatches(net.minecraft.client.gui.GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci, int i, int j, long l, float f) {
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, ModConfig.iconOpacity.get()/100F);
         moderateLoadingScreen$loadingScreen.renderPatches(new DrawContextWrapper(context), delta, f >= 1.0f);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0F);
     }
 
     // logo透明度
