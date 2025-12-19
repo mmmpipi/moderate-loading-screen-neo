@@ -9,26 +9,60 @@ import dev.enjarai.mls.config.ModConfig;
 import dev.enjarai.mls.config.Orientation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public abstract class LoadingScreen {
     protected final int patchSize = ModConfig.iconSize.get();
-    protected final Orientation orientation = ModConfig.orientation.get();
+    protected final Orientation orientation;
     protected final Minecraft client;
     protected final ArrayList<ResourceLocation> icons;
     protected final Random random = new Random();
     protected final ArrayList<Patch> patches = new ArrayList<>();
     protected double patchTimer = 0f;
+    protected Supplier<Integer> widthSupplier;
+    protected Supplier<Integer> heightSupplier;
     //protected boolean tater = ModerateLoadingScreen.CONFIG.showTater;
     protected boolean modsOnlyOnce = ModConfig.modsOnlyOnce.get();
+    public Optional<Supplier<Float>> scaleFix = Optional.empty();
+    protected int offsetX = 0;
+    protected int offsetY = 0;
 
-    public LoadingScreen(Minecraft client) {
+    public LoadingScreen(Minecraft client, boolean isEarlyLoad) {
         this.client = client;
-
+        this.widthSupplier = ()->client.getWindow().getGuiScaledWidth();
+        this.heightSupplier = ()->client.getWindow().getGuiScaledHeight();
+        if (isEarlyLoad){
+            var temp = ModConfig.orientation.get();
+            if (temp == Orientation.DOWN){
+                this.orientation = Orientation.UP;
+            }else if (temp == Orientation.UP){
+                this.orientation = Orientation.DOWN;
+            }else if (temp == Orientation.LEFT){
+                this.orientation = Orientation.RIGHT;
+            }else {
+                this.orientation = Orientation.LEFT;
+            }
+        }else{
+            this.orientation = ModConfig.orientation.get();
+        }
         icons = ModerateLoadingScreen.getIcon();
+    }
+    public void setOffset(int x, int y){
+        this.offsetX = x;
+        this.offsetY = y;
+    }
+    public void setWidthSupplier(Supplier<Integer> supplier){
+        this.widthSupplier = supplier;
+    }
+    public void setHeightSupplier(Supplier<Integer> supplier){
+        this.heightSupplier = supplier;
     }
 
     public abstract void createPatch(ResourceLocation texture);
@@ -69,19 +103,19 @@ public abstract class LoadingScreen {
     }
 
     protected double getOffsetX() {
-        return 0;
+        return offsetX;
     }
 
     protected double getOffsetY() {
-        return 0;
+        return offsetY;
     }
 
     protected int getScreenWidth() {
-        return orientation.switchAxes ? client.getWindow().getGuiScaledHeight() : client.getWindow().getGuiScaledWidth();
+        return orientation.switchAxes ? heightSupplier.get() : widthSupplier.get();
     }
 
     protected int getScreenHeight() {
-        return orientation.switchAxes ? client.getWindow().getGuiScaledWidth() : client.getWindow().getGuiScaledHeight();
+        return orientation.switchAxes ? widthSupplier.get() : heightSupplier.get();
     }
 
     protected void processPhysics(float delta, boolean ending) {
@@ -98,7 +132,6 @@ public abstract class LoadingScreen {
         if (delta < 2.0f)
             updatePatches(delta, ending);
 
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
@@ -145,27 +178,28 @@ public abstract class LoadingScreen {
         public void render(DrawContextWrapper wrapper, double offsetX, double offsetY) {
             PoseStack matrices = wrapper.matrices();
             matrices.pushPose();
+            float fixScale = scaleFix.map(Supplier::get).orElse(1.0F);
             if (orientation.switchAxes) {
                 matrices.translate(
-                        perhapsInvert(y + offsetY, getScreenHeight()),
-                        perhapsInvert(x + offsetX, getScreenWidth()),
+                        perhapsInvert((y + offsetY), getScreenHeight())* fixScale,
+                        perhapsInvert((x + offsetX), getScreenWidth())* fixScale,
                         0
                 );
             } else {
                 matrices.translate(
-                        perhapsInvert(x + offsetX, getScreenWidth()),
-                        perhapsInvert(y + offsetY, getScreenHeight()),
+                        perhapsInvert((x + offsetX), getScreenWidth())* fixScale,
+                        perhapsInvert((y + offsetY), getScreenHeight())* fixScale,
                         0
                 );
             }
 
             Matrix4f matrix = matrices.last().pose();
-            MatrixUtil.mulComponentWise(matrix.rotate((float) rot * 0.017453292F, 0, 0, 1), (float) scale);
+            MatrixUtil.mulComponentWise(matrix.rotate((float) rot * 0.017453292F, 0, 0, 1), (float) scale * fixScale);
 
-            double x1 = -patchSize / 2d;
-            double y1 = -patchSize / 2d;
-            double x2 = patchSize / 2d;
-            double y2 = patchSize / 2d;
+            double x1 = -patchSize / 2d * fixScale;
+            double y1 = -patchSize / 2d * fixScale;
+            double x2 = patchSize / 2d * fixScale;
+            double y2 = patchSize / 2d * fixScale;
 
             wrapper.drawTexturedQuad(texture, (int) x1, (int) x2, (int) y1, (int) y2);
             matrices.popPose();

@@ -2,7 +2,6 @@ package dev.enjarai.mls.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.enjarai.mls.DrawContextWrapper;
-import dev.enjarai.mls.ModerateLoadingScreen;
 import dev.enjarai.mls.config.ModConfig;
 import dev.enjarai.mls.screens.LoadingScreen;
 import dev.enjarai.mls.screens.SnowFlakesScreen;
@@ -43,8 +42,8 @@ public abstract class SplashOverlayMixin extends Overlay {
     )
     private void moderateLoadingScreen$constructor(Minecraft client, ReloadInstance monitor, Consumer<Optional<Throwable>> exceptionHandler, boolean reloading, CallbackInfo ci) {
         moderateLoadingScreen$loadingScreen = switch (ModConfig.screenType.get()) {
-            case SNOWFLAKES -> new SnowFlakesScreen(this.minecraft);
-            case STACKING -> new StackingScreen(this.minecraft);
+            case SNOWFLAKES -> new SnowFlakesScreen(this.minecraft,false);
+            case STACKING -> new StackingScreen(this.minecraft,false);
         };
     }
 
@@ -66,6 +65,7 @@ public abstract class SplashOverlayMixin extends Overlay {
     // logo前注入图标
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;guiHeight()I", ordinal = 2), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void moderateLoadingScreen$renderPatches(net.minecraft.client.gui.GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci, int i, int j, long l, float f) {
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         moderateLoadingScreen$loadingScreen.renderPatches(new DrawContextWrapper(context), delta, f >= 1.0f);
     }
 

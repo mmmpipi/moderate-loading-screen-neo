@@ -3,6 +3,7 @@ package dev.enjarai.mls.screens;
 import dev.enjarai.mls.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -13,9 +14,10 @@ public class StackingScreen extends LoadingScreen {
     protected double scrollDelta = 0;
     private final int cycleSeconds = ModConfig.cycleSeconds.get();
 
-    public StackingScreen(Minecraft client) {
-        super(client);
+    public StackingScreen(Minecraft client, boolean isEarlyLoad) {
+        super(client, isEarlyLoad);
     }
+
 
     @Override
     public void createPatch(ResourceLocation texture) {
@@ -69,12 +71,12 @@ public class StackingScreen extends LoadingScreen {
 
     @Override
     protected double getOffsetX() {
-        return getScreenWidth() % patchSize / 2.0;
+        return (getScreenWidth() % patchSize / 2.0) + offsetX;
     }
 
     @Override
     protected double getOffsetY() {
-        return scroll + getScreenHeight();
+        return (scroll + getScreenHeight()) + offsetY;
     }
 
     @Override

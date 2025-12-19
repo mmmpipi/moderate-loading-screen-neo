@@ -1,36 +1,50 @@
 package dev.enjarai.mls;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.logging.LogUtils;
 import dev.enjarai.mls.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.*;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forgespi.language.IModInfo;
-import net.minecraftforge.resource.PathPackResources;
-import net.minecraftforge.resource.ResourcePackLoader;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.gui.ModListScreen;
+import net.neoforged.neoforge.common.util.Size2i;
+import net.neoforged.neoforge.resource.ResourcePackLoader;
+import net.neoforged.neoforgespi.language.IModInfo;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.function.Predicate;
 
-import static dev.enjarai.mls.config.ModConfigScreen.FACTORY;
 
-@Mod("mls")
+@Mod(ModerateLoadingScreen.MODID)
 public class ModerateLoadingScreen {
     public static final String MODID = "mls";
-    public ModerateLoadingScreen(){
-        ModLoadingContext.get().registerExtensionPoint(FACTORY.getClass(), () -> FACTORY);
-        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, ModConfig.SPEC);
+    private static final Logger logger = LogUtils.getLogger();
+    public ModerateLoadingScreen(IEventBus modEventBus, ModContainer container){
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT,ModConfig.SPEC);
+//        ModLoadingContext.get().registerExtensionPoint(FACTORY.getClass(), () -> FACTORY);
     }
 
+    private static ArrayList<ResourceLocation> cachedIcons = null;
+
     public static ArrayList<ResourceLocation> getIcon(){
+        if (cachedIcons!=null)return cachedIcons;
         ArrayList<ResourceLocation> result = new ArrayList<>();
 
         for (IModInfo modInfo : ModList.get().getMods()) {
@@ -39,31 +53,31 @@ public class ModerateLoadingScreen {
             if(ModConfig.modIdBlacklist.get().stream().anyMatch(Predicate.isEqual(modId))) continue;
 
             ModContainer modContainer = ModList.get().getModContainerById(modId).orElse(null);
-            String icon = modContainer.getModInfo().getLogoFile().orElse(null);
-            if (icon == null) continue;
+            if (modContainer == null) continue;
+            String logoFile = modContainer.getModInfo().getLogoFile().orElse(null);
+            if (logoFile == null) continue;
 
             TextureManager tm = Minecraft.getInstance().getTextureManager();
-            final PathPackResources resourcePack = ResourcePackLoader.getPackFor(modInfo.getModId())
-                    .orElse(ResourcePackLoader.getPackFor("forge").
-                            orElseThrow(()->new RuntimeException("Can't find forge, WHAT!")));
+            final Pack.ResourcesSupplier resourcePack = ResourcePackLoader.getPackFor(modInfo.getModId()).orElse(ResourcePackLoader.getPackFor("neoforge").orElseThrow(()->new RuntimeException("Can't find forge, WHAT!")));
 
-            try {
+            try (PackResources packResources = resourcePack.openPrimary(new PackLocationInfo("mod/" + modId, Component.empty(), PackSource.BUILT_IN, Optional.empty()))) {
                 NativeImage logo;
-                IoSupplier<InputStream> logoResource = resourcePack.getRootResource(icon);
+                IoSupplier<InputStream> logoResource = packResources.getRootResource(logoFile.split("[/\\\\]"));
                 if (logoResource != null) {
-                    logo = NativeImage.read(logoResource.get());
+                    logo = NativeImage.read((InputStream)logoResource.get());
                     result.add(tm.register("modlogo", new DynamicTexture(logo) {
                         @Override
                         public void upload() {
                             this.bind();
                             NativeImage td = this.getPixels();
-                            // Use custom "blur" value which controls texture filtering (nearest-neighbor vs linear)
                             this.getPixels().upload(0, 0, 0, 0, 0, td.getWidth(), td.getHeight(), modInfo.getLogoBlur(), false, false, false);
                         }
                     }));
                 }
-            } catch (IOException ignored) {}
+            } catch (IllegalArgumentException | IOException ignored) {
+            }
         }
+        cachedIcons = result;
         return result;
     }
 
@@ -105,7 +119,7 @@ public class ModerateLoadingScreen {
         /*? if >=1.21 {*//*
         return Identifier.of(MODID, path);
         *//*?} else {*/
-        return new ResourceLocation(MODID, path);
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
         /*?} */
     }
 }

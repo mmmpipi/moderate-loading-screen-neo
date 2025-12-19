@@ -1,29 +1,34 @@
 package dev.enjarai.mls.config;
 
 
-import net.minecraftforge.common.ForgeConfigSpec;
+
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class ModConfig {
 
-    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-    private static final ForgeConfigSpec.Builder push = BUILDER.push("Moderate Loading Screen");
-    public static final ForgeConfigSpec.ConfigValue<Integer> backgroundColor = BUILDER.define("backgroundColor", 0x161616);
-    public static final ForgeConfigSpec.ConfigValue<Integer> logoOpacity = BUILDER.defineInRange("logoOpacity", 100, 0, 100);
-    public static final ForgeConfigSpec.ConfigValue<Integer> barOpacity = BUILDER.defineInRange("barOpacity", 100, 0, 100);
-    public static final ForgeConfigSpec.BooleanValue modsOnlyOnce = BUILDER.define("modsOnlyOnce", false);
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> modIdBlacklist = BUILDER.defineList("modIdBlacklist", Arrays.asList(
-            "forge",
+    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    private static final ModConfigSpec.Builder push = BUILDER.push("Moderate Loading Screen");
+    public static final ModConfigSpec.ConfigValue<Integer> backgroundColor = BUILDER.define("backgroundColor", 0x161616);
+    public static final ModConfigSpec.ConfigValue<Integer> logoOpacity = BUILDER.defineInRange("logoOpacity", 100, 0, 100);
+    public static final ModConfigSpec.ConfigValue<Integer> barOpacity = BUILDER.defineInRange("barOpacity", 100, 0, 100);
+    public static final ModConfigSpec.BooleanValue modsOnlyOnce = BUILDER.define("modsOnlyOnce", false);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> modIdBlacklist = BUILDER.defineList("modIdBlacklist", Arrays.asList(
+            "neoforge",
             "minecraft"
-    ), o -> o instanceof String);
+    ),()->"mod_id", o -> o instanceof String);
 
-    public static final ForgeConfigSpec.ConfigValue<Integer> iconSize = BUILDER.define("iconSize", 32);
-    public static final ForgeConfigSpec.EnumValue<ScreenTypes> screenType = BUILDER.defineEnum("screenType", ScreenTypes.STACKING);
-    public static final ForgeConfigSpec.EnumValue<Orientation> orientation = BUILDER.defineEnum("orientation", Orientation.DOWN);
-    public static final ForgeConfigSpec.ConfigValue<Integer> cycleSeconds = BUILDER.define("cycleSeconds", 20);
-    private static final ForgeConfigSpec.Builder pop = BUILDER.pop();
-    public static final ForgeConfigSpec SPEC = BUILDER.build();
+    public static final ModConfigSpec.ConfigValue<Integer> iconSize = BUILDER.define("iconSize", 32);
+    public static final ModConfigSpec.EnumValue<ScreenTypes> screenType = BUILDER.defineEnum("screenType", ScreenTypes.SNOWFLAKES);
+    public static final ModConfigSpec.EnumValue<Orientation> orientation = BUILDER.defineEnum("orientation", Orientation.DOWN);
+    public static final ModConfigSpec.ConfigValue<Integer> cycleSeconds = BUILDER.define("cycleSeconds", 20);
+    public static final ModConfigSpec.BooleanValue earlyWindowOverlay = BUILDER.comment("Show LoadingScreen Over NeoForge LoadingScreen")
+            .define("earlyWindowOverlay", false);
+    public static final ModConfigSpec.ConfigValue<Integer> earlyOverlayOpacity = BUILDER.comment("Set Early LoadingScreen Overlay Alpha")
+            .defineInRange("earlyOverlayOpacity", 45, 0, 100);
+    private static final ModConfigSpec.Builder pop = BUILDER.pop();
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
 }

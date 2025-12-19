@@ -21,7 +21,7 @@ public interface DrawContextAccessor {
             float v0,
             float v1);
 }
-*//*?} else {*/
+/*?} else {*/
 @Mixin(net.minecraft.client.gui.GuiGraphics.class)
 public interface DrawContextAccessor {
     @Invoker("innerBlit")
