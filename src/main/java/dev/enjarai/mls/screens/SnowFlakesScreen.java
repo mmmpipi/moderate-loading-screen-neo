@@ -2,7 +2,6 @@ package dev.enjarai.mls.screens;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 public class SnowFlakesScreen extends LoadingScreen {
 

@@ -2,17 +2,13 @@ package dev.enjarai.mls.mixin;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.mojang.logging.LogUtils;
-import dev.enjarai.mls.config.ModConfig;
 import net.neoforged.fml.loading.FMLPaths;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public class ModMixinPlugin implements IMixinConfigPlugin {
     @Override

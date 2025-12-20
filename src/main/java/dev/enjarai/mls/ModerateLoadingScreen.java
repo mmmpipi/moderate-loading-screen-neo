@@ -15,18 +15,13 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.gui.ModListScreen;
-import net.neoforged.neoforge.common.util.Size2i;
 import net.neoforged.neoforge.resource.ResourcePackLoader;
 import net.neoforged.neoforgespi.language.IModInfo;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -38,7 +33,6 @@ public class ModerateLoadingScreen {
     private static final Logger logger = LogUtils.getLogger();
     public ModerateLoadingScreen(IEventBus modEventBus, ModContainer container){
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT,ModConfig.SPEC);
-//        ModLoadingContext.get().registerExtensionPoint(FACTORY.getClass(), () -> FACTORY);
     }
 
     private static ArrayList<ResourceLocation> cachedIcons = null;
@@ -64,7 +58,7 @@ public class ModerateLoadingScreen {
                 NativeImage logo;
                 IoSupplier<InputStream> logoResource = packResources.getRootResource(logoFile.split("[/\\\\]"));
                 if (logoResource != null) {
-                    logo = NativeImage.read((InputStream)logoResource.get());
+                    logo = NativeImage.read(logoResource.get());
                     result.add(tm.register("modlogo", new DynamicTexture(logo) {
                         @Override
                         public void upload() {

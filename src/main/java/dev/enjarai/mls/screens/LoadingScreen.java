@@ -9,12 +9,9 @@ import dev.enjarai.mls.config.ModConfig;
 import dev.enjarai.mls.config.Orientation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -30,7 +27,7 @@ public abstract class LoadingScreen {
     protected Supplier<Integer> heightSupplier;
     //protected boolean tater = ModerateLoadingScreen.CONFIG.showTater;
     protected boolean modsOnlyOnce = ModConfig.modsOnlyOnce.get();
-    protected Optional<Supplier<Float>> scaleFix = Optional.empty();
+    protected Supplier<Float> scaleFix = null;
     protected int offsetX = 0;
     protected int offsetY = 0;
 
@@ -60,7 +57,7 @@ public abstract class LoadingScreen {
     }
 
     public void setScaleFix(Supplier<Float> supplier){
-        this.scaleFix = Optional.of(supplier);
+        this.scaleFix = supplier;
     }
 
     public void setWidthSupplier(Supplier<Integer> supplier){
@@ -183,7 +180,10 @@ public abstract class LoadingScreen {
         public void render(DrawContextWrapper wrapper, double offsetX, double offsetY) {
             PoseStack matrices = wrapper.matrices();
             matrices.pushPose();
-            float fixScale = scaleFix.map(Supplier::get).orElse(1.0F);
+            float fixScale = 1.0F;
+            if (scaleFix!=null){
+                fixScale = scaleFix.get();
+            }
             if (orientation.switchAxes) {
                 matrices.translate(
                         perhapsInvert((y + offsetY), getScreenHeight())* fixScale,
