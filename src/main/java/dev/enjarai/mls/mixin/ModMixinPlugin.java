@@ -2,6 +2,7 @@ package dev.enjarai.mls.mixin;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.mojang.logging.LogUtils;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLPaths;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -22,6 +23,7 @@ public class ModMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (Dist.CLIENT.isDedicatedServer())return false;
         if (mixinClassName.equals("dev.enjarai.mls.mixin.ForgeLoadingOverlayMixin")){
             boolean enable = true;
             var config = FileConfig.of(FMLPaths.CONFIGDIR.get().resolve("mls-client.toml"));

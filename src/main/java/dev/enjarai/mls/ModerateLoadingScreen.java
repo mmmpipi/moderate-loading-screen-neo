@@ -12,10 +12,13 @@ import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.resource.ResourcePackLoader;
 import net.neoforged.neoforgespi.language.IModInfo;
 import org.slf4j.Logger;
@@ -27,18 +30,19 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 
-@Mod(ModerateLoadingScreen.MODID)
+@Mod(value = ModerateLoadingScreen.MODID, dist = Dist.CLIENT)
 public class ModerateLoadingScreen {
     public static final String MODID = "mls";
     private static final Logger logger = LogUtils.getLogger();
     public ModerateLoadingScreen(IEventBus modEventBus, ModContainer container){
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT,ModConfig.SPEC);
+        //container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 
     private static ArrayList<ResourceLocation> cachedIcons = null;
 
     public static ArrayList<ResourceLocation> getIcon(){
-        if (cachedIcons!=null)return cachedIcons;
+        if (ModConfig.modsOnlyOnce.get()&&cachedIcons!=null)return cachedIcons;
         ArrayList<ResourceLocation> result = new ArrayList<>();
 
         for (IModInfo modInfo : ModList.get().getMods()) {
